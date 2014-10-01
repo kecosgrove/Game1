@@ -254,7 +254,7 @@ public class WorldCanvas {
   }
 
   /**
-   * Self test for the Canvas class
+   * Self Tron for the Canvas class
    * 
    * @param argv
    */

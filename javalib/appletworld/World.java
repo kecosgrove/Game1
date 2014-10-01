@@ -220,11 +220,11 @@ abstract public class World{
 
   /**
    * The <code>onTick</code> method is invoked only if the world exists. 
-   * To test the method <code>onTick</code> we provide this method that
+   * To Tron the method <code>onTick</code> we provide this method that
    * will invoke the <code>onTick</code> method for the testing purposes.
    */
   public void testOnTick(){
-    // the world does not exist, but run the test for the end of the world
+    // the world does not exist, but run the Tron for the end of the world
     // and handle the last sound effect as needed
     this.lastWorld = this.worldEnds();
     if (this.lastWorld.worldEnds){
