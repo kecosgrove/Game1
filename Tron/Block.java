@@ -9,7 +9,7 @@ import java.awt.*;
 /**
  * Created by User on 9/30/2014.
  */
-public class Block {
+public class Block implements WorldObject {
 
     Posn position;
     Color color;
@@ -21,8 +21,14 @@ public class Block {
         this.side = side;
     }
 
-    public WorldImage blockImage() {
+    public WorldImage getImage() {
         return new RectangleImage(position, side, side, color);
+    }
+
+    public Block onTick() {
+        Block newBlock = this;
+        newBlock.position.y = newBlock.position.y + 1;
+        return newBlock;
     }
 
 }
