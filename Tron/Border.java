@@ -9,12 +9,12 @@ import java.awt.*;
 /**
  * Created by User on 10/2/2014.
  */
-public class Border implements WorldObject {
+public class Border {
 
-    Posn position;
-    Color color;
-    int vertSide;
-    int horiSide;
+    private Posn position;
+    private Color color;
+    private int vertSide;
+    private int horiSide;
 
     public Border(Posn position, Color color, int vertSide, int horiSide) {
         this.position = position;
@@ -27,9 +27,15 @@ public class Border implements WorldObject {
         return new RectangleImage(position, vertSide, horiSide, color);
     }
 
-    public Border onTick() {
+    public Border setPos(Posn newPos) {
         Border newBorder = this;
+        newBorder.position = newPos;
         return newBorder;
+    }
+
+    public Posn getPos() {
+        Posn position = this.position;
+        return position;
     }
 
 }

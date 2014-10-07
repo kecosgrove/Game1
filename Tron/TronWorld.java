@@ -13,51 +13,78 @@ import java.awt.*;
 */
 public class TronWorld extends World {
 
-    static final int screenWidth = 600;
-    static final int screenHeight = 600;
-    public WorldImage image;
-    WorldObject[] borders;
-    WorldObject block;
+    private static final int screenSide = 620;
+    private static final int blockRows = 30;
+    private static final int blockSide = 19;
+    private static final Color blockColor = new Color(0, 0, 0);
+    private final Color boardColor = new Color(51, 102, 255);
+    private final WorldImage image = new RectangleImage(new Posn(0, 0),
+                                                            screenSide*2, screenSide*2, boardColor);
 
-    public TronWorld(WorldObject block, WorldObject[] borders) {
+    Border[] borders = new Border[4];
+    PlayingSquare[][] board = new PlayingSquare[blockRows][blockRows];
+    int activeX;
+    int activeY;
+    int rotation = 0;
+
+    public TronWorld(int activeX, int activeY, PlayingSquare[][] board) {
         super();
-        image = new RectangleImage(new Posn(0, 0), screenWidth*2, screenHeight*2, new Color(51, 102, 255));
-        this.block = block;
-        this.borders = borders;
+        this.activeX = activeX;
+        this.activeY = activeY;
+        this.board = board;
+        for (int i = 0; i < borders.length; i++) {
+            borders[0] = new Border(new Posn(screenSide / 2, 0), blockColor, screenSide, 20);
+            borders[1] = new Border(new Posn(screenSide / 2, screenSide), blockColor, screenSide, 20);
+            borders[2] = new Border(new Posn(0, screenSide / 2), blockColor, 20, screenSide);
+            borders[3] = new Border(new Posn(screenSide, screenSide / 2), blockColor, 20, screenSide);
+        }
     }
 
     public World onTick() {
-        WorldObject[] newBorders = new Border[4];
-        for (int i = 0; i < newBorders.length; i++) {
-            newBorders[i] = borders[i].onTick();
+        PlayingSquare[][] nextBoard = new PlayingSquare[blockRows][blockRows];
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[0].length; j++) {
+                nextBoard[i][j] = board[i][j];
+            }
         }
-        return new TronWorld(block.onTick(), newBorders);
+        //Next Step: do hit detection, modify nextBoard and select inputs for activeX activeY to
+        //represent this modification
+        return new TronWorld(activeX, activeY, nextBoard);
     }
 
     public World onKeyEvent(String ke) {
         return this;
     }
 
-    public World onMouseClicked(Posn p) {return this;
-    }
+    public World onMouseClicked(Posn p) {return this;}
 
     public WorldImage makeImage() {
         WorldImage image = this.image;
         for (int i = 0; i < borders.length; i++) {
             image = new OverlayImages(image, borders[i].getImage());
         }
-        return new OverlayImages(image, block.getImage());
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[0].length; j++) {
+                if (board[i][j].isFilled()) image = new OverlayImages(image, board[i][j].getImage());
+            }
+        }
+        return image;
+    }
+
+    private static Posn posFromArray(int x, int y) {
+        return new Posn(20*(x+1), 20*(y+1));
     }
 
     public static void main(String[] args) {
-        Border[] borders = new Border[4];
-        Color borderColor = new Color(255, 80, 80);
-        borders[0] = new Border(new Posn(screenWidth/2, 0), borderColor, screenWidth, 20);
-        borders[1] = new Border(new Posn(screenWidth/2, screenHeight), borderColor, screenWidth, 20);
-        borders[2] = new Border(new Posn(0, screenHeight/2), borderColor, 20, screenHeight);
-        borders[3] = new Border(new Posn(screenWidth, screenHeight/2), borderColor, 20, screenHeight);
-        TronWorld firstWorld = new TronWorld(new Block(new Posn(screenWidth/2, 20), new Color(0, 0, 0), 20), borders);
-        firstWorld.bigBang(screenWidth, screenHeight);
+        PlayingSquare[][] initBoard = new PlayingSquare[blockRows][blockRows];
+        for (int i = 0; i < initBoard.length; i++) {
+            for (int j = 0; j < initBoard[0].length; j++) {
+                initBoard[i][j] = new EmptySquare();
+            }
+        }
+        initBoard[0][0] = new Block(posFromArray(0, 0), blockColor, blockSide);
+        TronWorld firstWorld = new TronWorld(0, 0, initBoard);
+        firstWorld.bigBang(screenSide, screenSide, 1);
     }
 
 }
