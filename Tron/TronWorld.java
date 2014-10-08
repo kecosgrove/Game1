@@ -15,7 +15,9 @@ public class TronWorld extends World {
 
     private static final int screenSide = 620;
     private static final int blockRows = 30;
-    private static final int blockSide = 19;
+    private static final int rowSize = 20;
+    private static final int blockSide = 18;
+    private static final int borderWidth = 10;
     private static final Color blockColor = new Color(0, 0, 0);
     private final Color boardColor = new Color(51, 102, 255);
     private final WorldImage image = new RectangleImage(new Posn(0, 0),
@@ -25,19 +27,21 @@ public class TronWorld extends World {
     PlayingSquare[][] board = new PlayingSquare[blockRows][blockRows];
     int activeX;
     int activeY;
-    int rotation = 0;
+    int rotation;
 
-    public TronWorld(int activeX, int activeY, PlayingSquare[][] board) {
+    public TronWorld(int activeX, int activeY, PlayingSquare[][] board, int rotation) {
         super();
         this.activeX = activeX;
         this.activeY = activeY;
         this.board = board;
+        this.rotation = rotation;
         for (int i = 0; i < borders.length; i++) {
-            borders[0] = new Border(new Posn(screenSide / 2, 0), blockColor, screenSide, 20);
-            borders[1] = new Border(new Posn(screenSide / 2, screenSide), blockColor, screenSide, 20);
-            borders[2] = new Border(new Posn(0, screenSide / 2), blockColor, 20, screenSide);
-            borders[3] = new Border(new Posn(screenSide, screenSide / 2), blockColor, 20, screenSide);
+            borders[0] = new Border(new Posn(screenSide / 2, 0), blockColor, screenSide, borderWidth*2);
+            borders[1] = new Border(new Posn(screenSide / 2, screenSide), blockColor, screenSide, borderWidth*2);
+            borders[2] = new Border(new Posn(0, screenSide / 2), blockColor, borderWidth*2, screenSide);
+            borders[3] = new Border(new Posn(screenSide, screenSide / 2), blockColor, borderWidth*2, screenSide);
         }
+        this.board[activeX][activeY] = new Block(posFromArray(activeX, activeY), blockColor, blockSide);
     }
 
     public World onTick() {
@@ -49,7 +53,7 @@ public class TronWorld extends World {
         }
         //Next Step: do hit detection, modify nextBoard and select inputs for activeX activeY to
         //represent this modification
-        return new TronWorld(activeX, activeY, nextBoard);
+        return new TronWorld(activeX, activeY, nextBoard, rotation);
     }
 
     public World onKeyEvent(String ke) {
@@ -71,8 +75,16 @@ public class TronWorld extends World {
         return image;
     }
 
-    private static Posn posFromArray(int x, int y) {
-        return new Posn(20*(x+1), 20*(y+1));
+    public Posn posFromArray(int x, int y) {
+        int offset = borderWidth + rowSize/2;
+        switch (rotation) {
+            case 0: return new Posn(x*rowSize + offset, y*rowSize + offset);
+            case 1: return new Posn(screenSide - (y*rowSize) - offset, x*rowSize + offset );
+            case 2: return new Posn(screenSide - (x*rowSize) - offset, screenSide - (y*rowSize) - offset);
+            default: return new Posn(y*rowSize + offset, screenSide - (x*rowSize) - offset);
+        }
+
+        //Make to reflect the position relative to rotation
     }
 
     public static void main(String[] args) {
@@ -82,9 +94,8 @@ public class TronWorld extends World {
                 initBoard[i][j] = new EmptySquare();
             }
         }
-        initBoard[0][0] = new Block(posFromArray(0, 0), blockColor, blockSide);
-        TronWorld firstWorld = new TronWorld(0, 0, initBoard);
-        firstWorld.bigBang(screenSide, screenSide, 1);
+        TronWorld firstWorld = new TronWorld(0, 0, initBoard, 3);
+        firstWorld.bigBang(screenSide, screenSide, 0);
     }
 
 }
