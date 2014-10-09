@@ -45,15 +45,23 @@ public class TronWorld extends World {
     }
 
     public World onTick() {
+        System.out.println("hi");
+        int nextX = activeX;
+        int nextY = activeY;
+        switch (rotation) {
+            case 0: nextY++; break;
+            case 1: nextX++; break;
+            case 2: nextY--; break;
+            default: nextX--; break;
+        }
+        if(board[nextX][nextY].isFilled() || !inbounds(nextX, nextY)) return this.endOfWorld("Collision!");
         PlayingSquare[][] nextBoard = new PlayingSquare[blockRows][blockRows];
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[0].length; j++) {
                 nextBoard[i][j] = board[i][j];
             }
         }
-        //Next Step: do hit detection, modify nextBoard and select inputs for activeX activeY to
-        //represent this modification
-        return new TronWorld(activeX, activeY, nextBoard, rotation);
+        return new TronWorld(nextX, nextY, nextBoard, rotation);
     }
 
     public World onKeyEvent(String ke) {
@@ -75,7 +83,7 @@ public class TronWorld extends World {
         return image;
     }
 
-    public Posn posFromArray(int x, int y) {
+    private Posn posFromArray(int x, int y) {
         int offset = borderWidth + rowSize/2;
         switch (rotation) {
             case 0: return new Posn(x*rowSize + offset, y*rowSize + offset);
@@ -83,8 +91,10 @@ public class TronWorld extends World {
             case 2: return new Posn(screenSide - (x*rowSize) - offset, screenSide - (y*rowSize) - offset);
             default: return new Posn(y*rowSize + offset, screenSide - (x*rowSize) - offset);
         }
+    }
 
-        //Make to reflect the position relative to rotation
+    private boolean inbounds(int x, int y) {
+        return x > -1 && x < blockRows && y > -1 && y < blockRows;
     }
 
     public static void main(String[] args) {
@@ -94,8 +104,8 @@ public class TronWorld extends World {
                 initBoard[i][j] = new EmptySquare();
             }
         }
-        TronWorld firstWorld = new TronWorld(0, 0, initBoard, 3);
-        firstWorld.bigBang(screenSide, screenSide, 0);
+        TronWorld firstWorld = new TronWorld(0, 0, initBoard, 0);
+        firstWorld.bigBang(screenSide, screenSide, 1);
     }
 
 }
