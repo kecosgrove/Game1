@@ -21,28 +21,14 @@ public class Block implements PlayingSquare {
         this.side = side;
     }
 
+    public boolean collides() {
+        return true;
+    }
+
+    public boolean hasImage() { return true; }
+
     public WorldImage getImage() {
         return new RectangleImage(position, side, side, color);
-    }
-
-    public Block setPos(Posn newPos) {
-        Block newBlock = this;
-        newBlock.position = position;
-        return newBlock;
-    }
-
-    public Posn getPos() {
-        Posn position = this.position;
-        return position;
-    }
-
-    public int getSide() {
-        int side = this.side;
-        return side;
-    }
-
-    public boolean isFilled() {
-        return true;
     }
 
 }
